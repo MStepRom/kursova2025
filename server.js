@@ -54,6 +54,7 @@ const taskRouter = require('./routes/tasks');
 app.use('/api/tasks', taskRouter);
 
 // create static assets from react code for production only
+/*
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static( 'client/build' ));
 
@@ -61,6 +62,7 @@ if (process.env.NODE_ENV === 'production') {
         res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
     });
 }
+*/
 
 // use port from environment variables for production
 const PORT = process.env.PORT || 5000;
