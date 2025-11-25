@@ -18,6 +18,9 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
     // Отримання токена для авторизації
     const token = localStorage.getItem('token');
 
+    // Додаємо базову URL API, використовуючи змінну оточення
+    const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+
     // Стилі для режиму відображення/редагування
     const itemStyle = {
         textDecoration: task.completed ? 'line-through' : 'none',
@@ -41,8 +44,11 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
         // Ми надсилаємо лише одне поле: completed
         const newCompletedStatus = !task.completed;
         
+        // ФОРМУЄМО ПОВНУ АДРЕСУ
+        const fullEndpoint = `${API_BASE_URL}/api/tasks/${task._id}`;
+
         try {
-            const res = await fetch(`/api/tasks/${task._id}`, {
+            const res = await fetch(fullEndpoint, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -65,9 +71,12 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
     // 2. Обробник збереження змін (Редагування)
     const handleSaveEdit = async (e) => {
         e.preventDefault();
+
+        // ФОРМУЄМО ПОВНУ АДРЕСУ
+        const fullEndpoint = `${API_BASE_URL}/api/tasks/${task._id}`;
         
         try {
-            const res = await fetch(`/api/tasks/${task._id}`, {
+            const res = await fetch(fullEndpoint, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,8 +101,11 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
 
     // 3. Обробник видалення завдання
     const handleDelete = async () => {
+        // ФОРМУЄМО ПОВНУ АДРЕСУ
+        const fullEndpoint = `${API_BASE_URL}/api/tasks/${task._id}`;
+
         try {
-            const res = await fetch(`/api/tasks/${task._id}`, {
+            const res = await fetch(fullEndpoint, {
                 method: 'DELETE',
                 headers: {
                     'x-auth-token': token

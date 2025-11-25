@@ -13,6 +13,9 @@ const TaskForm = ({ onTaskAdded }) => {
     const { title, description, priority, dueDate } = formData;
     // 1. Отримання токена з localStorage (для авторизації)
     const token = localStorage.getItem('token');
+    
+    // Додаємо базову URL API, використовуючи змінну оточення
+    const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,8 +24,11 @@ const TaskForm = ({ onTaskAdded }) => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        // Формуємо повну адресу запиту
+        const fullEndpoint = `${API_BASE_URL}/api/tasks`;
+
         try {
-            const res = await fetch('/api/tasks', {
+            const res = await fetch(fullEndpoint, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

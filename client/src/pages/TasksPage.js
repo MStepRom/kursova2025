@@ -10,6 +10,9 @@ const TasksPage = () => {
     const [tasks, setTasks] = useState([]);
     const navigate = useNavigate();
 
+    // Додаємо базову URL API, використовуючи змінну оточення
+    const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+
     // Змінні стану для сортування та фільтрації
     const [sortBy, setSortBy] = useState('createdAt'); // Датою створення (дефолт)
     const [filterCompleted, setFilterCompleted] = useState('all'); // 'all', 'completed', 'incomplete'
@@ -26,8 +29,11 @@ const TasksPage = () => {
             return;
         }
 
+        // ФОРМУЄМО ПОВНУ АДРЕСУ
+        const fullEndpoint = `${API_BASE_URL}/api/tasks`;
+
         try {
-            const res = await fetch('/api/tasks', {
+            const res = await fetch(fullEndpoint, {
                 method: 'GET',
                 headers: {
                     'x-auth-token': token // Відправка токена для авторизації

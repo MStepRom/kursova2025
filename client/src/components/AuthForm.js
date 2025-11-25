@@ -4,6 +4,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthForm = () => {
+    // Використовуємо змінну оточення
+    // На Render вона буде задана в налаштуваннях Render
+    // Локально - з client/.env (або використовуйте проксі)
+    const API_BASE_URL = process.env.REACT_APP_API_URL || ''; 
+    // Якщо змінна не задана, використовуємо пустий рядок (працює з проксі)
+
     // 1. Стан: перемикання між Входом та Реєстрацією
     const [isRegister, setIsRegister] = useState(false);
     
@@ -25,15 +31,17 @@ const AuthForm = () => {
     const onSubmit = async (e) => {
         e.preventDefault();
         
-        // Визначаємо URL залежно від режиму (Вхід або Реєстрація)
-        const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+        // Визначаємо шлях до кінцевої точки залежно від режиму (Вхід або Реєстрація)
+        const path = isRegister ? '/api/auth/register' : '/api/auth/login';
+        // ФОРМУЄМО ПОВНУ АДРЕСУ:
+        const fullEndpoint = `${API_BASE_URL}${path}`;
         
         // Створення об'єкта запиту
         const requestBody = isRegister ? { name, email, password } : { email, password };
         
         try {
             // Відправка запиту до бекенду
-            const res = await fetch(endpoint, {
+            const res = await fetch(fullEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
