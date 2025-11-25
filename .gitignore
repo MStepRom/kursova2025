@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Файли блокування
+package-lock.json
+/client/package-lock.json
+
+# Файли менеджера пакетів (якщо ви використовуєте лише один, другий можна додати для безпеки)
+yarn.lock
+/client/yarn.lock
