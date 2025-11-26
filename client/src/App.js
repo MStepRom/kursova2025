@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // 2. Імпортуємо сторінки
 import LoginPage from './pages/LoginPage';
 import TasksPage from './pages/TasksPage';
+import PollsPage from './pages/PollsPage';
 
 // Компонент App
 const App = () => {
@@ -20,6 +21,9 @@ const App = () => {
                     
                     {/* Маршрут для Завдань */}
                     <Route path="/tasks" element={<TasksPage />} />
+                    
+                    {/* Маршрут для Опитувань */}
+                    <Route path="/polls" element={<PollsPage />} />
                 </Routes>
             </main>
         </Router>

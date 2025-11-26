@@ -53,6 +53,10 @@ app.use('/api/auth', authRouter);
 const taskRouter = require('./routes/tasks');
 app.use('/api/tasks', taskRouter);
 
+// Підключення маршрутів опитувань (Polls)
+const pollRouter = require('./routes/polls');
+app.use('/api/polls', pollRouter);
+
 // create static assets from react code for production only
 /*
 if (process.env.NODE_ENV === 'production') {

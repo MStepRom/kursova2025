@@ -88,6 +88,11 @@ const TasksPage = () => {
         navigate('/');
     };
 
+    // 7. Перехід до опитувань
+    const goToPolls = () => {
+        navigate('/polls');
+    };
+
     // ЛОГІКА ФІЛЬТРАЦІЇ ТА СОРТУВАННЯ
     
     const getFilteredAndSortedTasks = useMemo(() => {
@@ -139,9 +144,18 @@ const TasksPage = () => {
             {/* СЕКЦІЯ: HEADER */}
             <header className="d-flex justify-content-between align-items-center py-3 border-bottom">
                 <h1 className="h3 mb-0">📝 PrioList: ваші завдання</h1>
-                <button onClick={handleLogout} className="btn btn-outline-danger btn-sm">
-                    Вийти
-                </button>
+                <div> 
+                    {/* КНОПКА ОПИТУВАННЯ */}
+                    <button 
+                        onClick={goToPolls} 
+                        className="btn btn-outline-info btn-sm me-2"> {/* me-2 додасть відступ */}
+                        📊 Опитування
+                    </button>
+                    {/* КНОПКА ВИЙТИ */}
+                    <button onClick={handleLogout} className="btn btn-outline-danger btn-sm">
+                        Вийти
+                    </button>
+                </div>
             </header>
             
             <TaskForm onTaskAdded={onTaskAdded} />

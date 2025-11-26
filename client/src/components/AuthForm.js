@@ -5,14 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 const AuthForm = () => {
     // Використовуємо змінну оточення
-    // На Render вона буде задана в налаштуваннях Render
-    // Локально - з client/.env (або використовуйте проксі)
+    // На Render вона буде задана в налаштуваннях Render, локально - з client/.env
     const API_BASE_URL = process.env.REACT_APP_API_URL || ''; 
-    // Якщо змінна не задана, використовуємо пустий рядок (працює з проксі)
-
+    
     // 1. Стан: перемикання між Входом та Реєстрацією
     const [isRegister, setIsRegister] = useState(false);
-    
+    const [error, setError] = useState(null); // Додаємо стан для помилок
+
     // 2. Стан: дані форми
     const [formData, setFormData] = useState({
         name: '',
@@ -30,7 +29,8 @@ const AuthForm = () => {
     // 4. Обробка відправки форми
     const onSubmit = async (e) => {
         e.preventDefault();
-        
+        setError(null); // Скидаємо помилки перед відправкою
+
         // Визначаємо шлях до кінцевої точки залежно від режиму (Вхід або Реєстрація)
         const path = isRegister ? '/api/auth/register' : '/api/auth/login';
         // ФОРМУЄМО ПОВНУ АДРЕСУ:
@@ -50,8 +50,6 @@ const AuthForm = () => {
             const data = await res.json();
 
             if (res.ok) {
-                console.log(data.msg);
-                
                 // 5. Збереження токена та ID користувача у локальному сховищі
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('userId', data.userId);
@@ -60,65 +58,85 @@ const AuthForm = () => {
                 navigate('/tasks');
 
             } else {
-                alert(data.msg || 'Помилка авторизації');
+                setError(data.msg || 'Помилка авторизації'); // Використовуємо setError
             }
 
         } catch (err) {
             console.error(err);
-            alert('Помилка сервера. Спробуйте пізніше.');
+            setError('Помилка сервера. Спробуйте пізніше.');
         }
     };
 
     return (
-        <div className="auth-container">
-            <h2>{isRegister ? 'Реєстрація (Алг. 2.1.1)' : 'Вхід (Алг. 2.1.2)'}</h2>
-            
-            <form onSubmit={onSubmit}>
-                {/* Поле "Ім'я" лише для Реєстрації */}
-                {isRegister && (
-                    <input
-                        type="text"
-                        placeholder="Ім'я"
-                        name="name"
-                        value={name}
-                        onChange={onChange}
-                        required={isRegister}
-                    />
-                )}
-                
-                <input
-                    type="email"
-                    placeholder="Email"
-                    name="email"
-                    value={email}
-                    onChange={onChange}
-                    required
-                />
-                
-                <input
-                    type="password"
-                    placeholder="Пароль"
-                    name="password"
-                    value={password}
-                    onChange={onChange}
-                    required
-                />
-                
-                <button type="submit">
-                    {isRegister ? 'Зареєструватися' : 'Увійти'}
-                </button>
-            </form>
-            
-            <p>
-                {isRegister ? 'Вже маєте акаунт?' : 'Не маєте акаунту?'}
-                <button 
-                    type="button" 
-                    onClick={() => setIsRegister(!isRegister)}
-                    style={{ marginLeft: '10px' }}
-                >
-                    {isRegister ? 'Увійти' : 'Зареєструватися'}
-                </button>
-            </p>
+        <div className="container mt-5">
+            <div className="row justify-content-center">
+                <div className="col-md-6 col-lg-4">
+                    <div className="card shadow-lg p-4">
+                        <h2 className="text-center mb-4">
+                            {isRegister ? 'Реєстрація у PrioList' : 'Вхід до PrioList'}
+                        </h2>
+
+                        {error && <div className="alert alert-danger">{error}</div>}
+
+                        <form onSubmit={onSubmit}>
+                            {/* Поле "Ім'я" лише для Реєстрації */}
+                            {isRegister && (
+                                <div className="mb-3">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Ім'я"
+                                        name="name"
+                                        value={name}
+                                        onChange={onChange}
+                                        required={isRegister}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="mb-3">
+                                <input
+                                    type="email"
+                                    className="form-control"
+                                    placeholder="Email"
+                                    name="email"
+                                    value={email}
+                                    onChange={onChange}
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    placeholder="Пароль"
+                                    name="password"
+                                    value={password}
+                                    onChange={onChange}
+                                    required
+                                />
+                            </div>
+
+                            <button type="submit" className="btn btn-primary w-100">
+                                {isRegister ? 'Зареєструватися' : 'Увійти'}
+                            </button>
+                        </form>
+
+                        {/* Посилання на перемикання режиму */}
+                        <p className="mt-3 text-center">
+                            {isRegister ? 'Вже маєте акаунт?' : 'Не маєте акаунту?'}
+                            <button
+                                type="button"
+                                onClick={() => setIsRegister(!isRegister)}
+                                className="btn btn-link p-0 ms-2"
+                            >
+                                {isRegister ? 'Увійти' : 'Зареєструватися'}
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
