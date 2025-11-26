@@ -169,7 +169,8 @@ const PollsPage = () => {
 
             if (res.ok) {
                 // Оновлюємо список опитувань, замінюючи старий об'єкт оновленим
-                setPolls(polls.map(poll => (poll._id === pollId ? data : poll)));
+                //setPolls(polls.map(poll => (poll._id === pollId ? data : poll)));
+                await fetchPolls();
             } else if (res.status === 401) {
                  handleLogout();
             } else {

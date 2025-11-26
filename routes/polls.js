@@ -50,9 +50,28 @@ router.post('/', authMiddleware, async (req, res) => {
 // ===================================================================
 router.get('/', authMiddleware, async (req, res) => {
     try {
-        // Отримуємо всі опитування, сортуємо за датою створення
-        const polls = await Poll.find().sort({ createdAt: -1 });
-        res.json(polls);
+        const userId = req.user.id; // Отримуємо ID поточного користувача з authMiddleware
+        
+        // 1. Отримання всіх опитувань з коректним сортуванням та .lean()
+        const polls = await Poll.find()
+            .populate('user', 'name')
+            .sort({ createdAt: -1 })
+            .lean(); // <<< Додаємо .lean() для ефективності та модифікації об'єктів
+
+        // 2. Додавання статусу голосування для кожного опитування
+        const pollsWithStatus = await Promise.all(polls.map(async (poll) => {
+            // Шукаємо, чи існує запис Vote для цього опитування та цього користувача
+            const existingVote = await Vote.findOne({ poll: poll._id, user: userId });
+
+            // Повертаємо опитування з новим полем hasVoted
+            return {
+                ...poll,
+                hasVoted: !!existingVote, // true, якщо existingVote існує, false — якщо ні
+            };
+        }));
+
+        res.json(pollsWithStatus);
+
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Помилка сервера при отриманні опитувань.');

@@ -4,7 +4,11 @@ import React, { useState, useMemo } from 'react';
 
 const PollItem = ({ poll, onVote, onDelete }) => {
     const userId = localStorage.getItem('userId');
-    const isOwner = poll.user === userId;
+    // 1. Спочатку визначаємо фактичний ID власника опитування:
+    //    Якщо poll.user є об'єктом, беремо poll.user._id. Якщо це вже рядок, беремо poll.user.
+    const pollOwnerId = poll.user ? (poll.user._id || poll.user) : null;
+    // 2. Порівнюємо їх, роблячи стійку перевірку
+    const isOwner = userId && pollOwnerId && String(pollOwnerId).trim() === userId.trim();
     
     // Стан для відстеження обраного варіанта (для кліку)
     const [selectedOption, setSelectedOption] = useState(null); 
@@ -17,6 +21,9 @@ const PollItem = ({ poll, onVote, onDelete }) => {
     // Ми будемо покладатися на логіку бекенду і відображати результати
     // після того, як користувач спробує проголосувати.
     const hasVoted = poll.hasVoted; // Поки що ігноруємо, додамо пізніше, якщо буде потрібно
+    // Право голосувати: Тільки якщо користувач ще не голосував.
+    const canVote = !poll.hasVoted;
+    const shouldShowResults = poll.hasVoted;
 
     // --- ЛОГІКА ПІДРАХУНКУ РЕЗУЛЬТАТІВ (useMemo) ---
     
@@ -34,7 +41,8 @@ const PollItem = ({ poll, onVote, onDelete }) => {
 
     // --- ОБРОБНИКИ ПОДІЙ ---
 
-    const handleVoteClick = () => {
+    const handleVoteSubmit = (e) => { // <<< ЗМІНА: ПЕРЕЙМЕНОВАНО І ДОДАНО e
+        e.preventDefault();
         if (selectedOption) {
             // Викликаємо функцію onVote, передану з PollsPage
             onVote(poll._id, selectedOption);
@@ -60,13 +68,15 @@ const PollItem = ({ poll, onVote, onDelete }) => {
                 </p>
 
                 {/* 1. Секція Голосування або Результатів */}
-                {results.totalVotes === 0 ? (
-                    <>
+                {canVote ? (
+                    // 1. Нова Секція Голосування
+                    <form id="voteForm" onSubmit={handleVoteSubmit}>
                         <p className="fw-bold mt-3">Проголосуйте:</p>
                         <div className="list-group">
                             {poll.options.map((option) => (
                                 <button
                                     key={option._id}
+                                    type="button" 
                                     className={`list-group-item list-group-item-action ${selectedOption === option._id ? 'active' : ''}`}
                                     onClick={() => setSelectedOption(option._id)}
                                 >
@@ -74,7 +84,7 @@ const PollItem = ({ poll, onVote, onDelete }) => {
                                 </button>
                             ))}
                         </div>
-                    </>
+                    </form>
                 ) : (
                     // 2. Секція Результатів
                     <div className="mt-3">
@@ -102,17 +112,18 @@ const PollItem = ({ poll, onVote, onDelete }) => {
                 {/* 3. КОНТЕЙНЕР ДЛЯ КНОПОК: Голосувати та Видалити (ГОРИЗОНТАЛЬНИЙ) */}
                 <div className="d-flex justify-content-between align-items-center mt-3"> 
                     
-                    {/* Кнопка Голосувати (відображається лише, якщо немає голосів) */}
-                    {results.totalVotes === 0 && (
+                    {/* Кнопка Голосувати (відображається лише, якщо форму видно) */}
+                    {canVote && (
                         <button
-                            className="btn btn-success"
-                            onClick={handleVoteClick}
+                            type="submit" // Зв'язуємо з формою
+                            form="voteForm" // <<< ЗВ'ЯЗОК З ФОРМОЮ
+                            className="btn btn-success" // <<< Прибираємо w-100
                             disabled={!selectedOption}
                         >
                             Проголосувати
                         </button>
                     )}
-                    
+
                     {/* Кнопка Видалення (Тільки для Автора) */}
                     {isOwner && (
                         <button 
